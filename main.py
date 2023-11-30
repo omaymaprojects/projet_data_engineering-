@@ -4,6 +4,7 @@ from sentence_transformers import SentenceTransformer
 import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
+import umap
 
 def dim_red(mat, p, method):
     '''
@@ -21,13 +22,13 @@ def dim_red(mat, p, method):
         pca = PCA(n_components=p)
         red_mat = pca.fit_transform(mat)
         
-        red_mat = mat[:,:p]
-        
     elif method=='AFC':
         red_mat = mat[:,:p]
         
     elif method=='UMAP':
-        red_mat = mat[:,:p]
+        reducer = umap.UMAP(n_components=p)
+        red_mat = reducer.fit_transform(mat)
+
         
     else:
         raise Exception("Please select one of the three methods : APC, AFC, UMAP")
@@ -48,11 +49,8 @@ def clust(mat, k):
         pred : list of predicted labels
     '''
     
-    kmeans = KMeans(n_clusters=k, init='k-means++', max_iter=300, n_init=10, random_state=42)
-    
-    # Adapte le modèle aux données et prédit les clusters
+    kmeans = KMeans(n_clusters=k, n_init=10, random_state=0)
     pred = kmeans.fit_predict(mat)
-    
     return pred
 
 # import data
